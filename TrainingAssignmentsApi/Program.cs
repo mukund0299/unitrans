@@ -5,10 +5,13 @@ using Serilog.Events;
 using Serilog.Filters;
 using Serilog.Formatting.Json;
 using Serilog.Sinks.SystemConsole.Themes;
+using TrainingAssignmentsApi.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSingleton<ISchedulerService, SchedulerService>();
+
 
 // API, Controllers
 builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
