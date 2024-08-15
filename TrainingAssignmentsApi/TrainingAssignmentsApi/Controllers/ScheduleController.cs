@@ -21,20 +21,21 @@ namespace TrainingAssignmentsApi.Controllers
             _schedulerService = schedulerService;
         }
 
-        [HttpPost]
+        [HttpPut]
+        [Route("")]
         public GenerateResponse Generate([FromBody] GenerateRequest request) {
             var assignments = _schedulerService.GenerateAssignments(request.Requests, request.Capacities);
             return GenerateResponseMapper.ToGenerateResponse(assignments);
         }
 
         [HttpGet]
-        [Route("Assignments")]
+        [Route("")]
         public GenerateResponse GetAssignments([FromQuery] DateOnly date) {
             throw new NotImplementedException();
         }
 
         [HttpDelete]
-        [Route("Assignments")]
+        [Route("")]
         public bool DeleteAssignments([FromQuery] DateOnly date) {
             throw new NotImplementedException();
         }
