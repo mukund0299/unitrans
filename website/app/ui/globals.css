@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.unitrans-bg-red {
+  --tw-bg-opacity: 1;
+    background-color: rgb(186 31 49 / var(--tw-bg-opacity));
+}
+
+.unitrans-text-red {
+  --tw-text-opacity: 1;
+  color: rgb(186 31 49 / var(--tw-text-opacity));
+}
