@@ -10,13 +10,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 export default function Page() {
 	const [data, setData] = useState(() => new Array<TrainingRequest>())
-	const [selectedDay, setSelectedDay] = useState(new Date())
+	const [date, setDate] = useState<Date | undefined>(new Date())
 	const [isDialogOpen, setDialogOpen] = useState(false)
 
 	return (
 		<div className="container">
 			<div className="flex justify-between mx-auto">
-				<DatePicker setTodayAsDefault={true} />
+				<DatePicker date={date} onSelect={(date) => setDate(date)} />
 				<Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
 					<DialogTrigger asChild>
 						<Button>Add Training Request</Button>
@@ -25,7 +25,7 @@ export default function Page() {
 						<DialogHeader>
 							<DialogTitle>New Training Request</DialogTitle>
 						</DialogHeader>
-						<AddTrainingRequest addTrainingRequest={(request: TrainingRequest) => {
+						<AddTrainingRequest date={date} addTrainingRequest={(request: TrainingRequest) => {
 							setData([...data, request])
 							setDialogOpen(false)
 							}} />

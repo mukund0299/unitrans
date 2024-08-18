@@ -8,33 +8,53 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BusType } from "@/lib/apiclients/TrainingAssignmentsApi";
-import { MultiSelector, MultiSelectorContent, MultiSelectorInput, MultiSelectorItem, MultiSelectorList, MultiSelectorTrigger } from "@/components/ui/multiselector";
+import MultipleSelector, { Option } from "@/components/ui/multipleselector";
 
-interface AddTrainingRequestProps {
-	addTrainingRequest: (request: TrainingRequest) => void
-}
+const OPTIONS: Option[] = [
+	{ label: "Electic Bus", value: BusType.ElectricBus },
+	{ label: "New Dennis", value: BusType.NewDennis },
+	{ label: "Old Dennis", value: BusType.OldDennis },
+	{ label: "Xcelsior", value: BusType.Xcelsior },
+	{ label: "NewFlyer", value: BusType.NewFlyer },
+];
+
+const optionSchema = z.object({
+	label: z.string(),
+	value: z.string(),
+	disable: z.boolean().optional(),
+});
 
 const addRequestFormSchema = z.object({
 	requestor: z.string().min(2, {message: "Must be at least two characters"}).max(30, {message: "Must be less than thirty characters"}),
-	startTime: z.string().time(),
-	endTime: z.string().time(),
-	busTypes: z.array(z.nativeEnum(BusType))
+	startTime: z.string(),
+	endTime: z.string(),
+	busTypes: z.array(optionSchema).min(1)
 })
 
-export default function AddTrainingRequest({addTrainingRequest}: AddTrainingRequestProps) {
+interface AddTrainingRequestProps {
+	date: Date | undefined,
+	addTrainingRequest: (request: TrainingRequest) => void
+}
+
+export default function AddTrainingRequest({date, addTrainingRequest}: AddTrainingRequestProps) {
 	const form = useForm<z.infer<typeof addRequestFormSchema>>({
 		resolver: zodResolver(addRequestFormSchema)
 	})
 
 	function onSubmit(values: z.infer<typeof addRequestFormSchema>) {
-		console.log(values)
-		// const trainingRequest: TrainingRequest = {
-		// 	requestor: values.requestor,
-		// 	startTime: new Date(values.startTime),
-		// 	endTime: new Date(values.endTime),
-		// 	busTypes: values.busTypes
-		// }
-		// addTrainingRequest(trainingRequest)
+		const startTime = new Date(date ??  new Date());
+		startTime.setHours(+values.startTime.split(":")[0], +values.startTime.split(":")[1])
+
+		const endTime = new Date(date ?? new Date());
+		endTime.setHours(+values.endTime.split(":")[0], +values.endTime.split(":")[1])
+		const trainingRequest: TrainingRequest = {
+			requestor: values.requestor,
+			startTime: startTime,
+			endTime: endTime,
+			busTypes: values.busTypes.map(x => x.value as BusType)
+		}
+		console.log(trainingRequest)
+		addTrainingRequest(trainingRequest)
 	}
 
 	return (
@@ -86,20 +106,11 @@ export default function AddTrainingRequest({addTrainingRequest}: AddTrainingRequ
 						<FormItem>
 							<FormLabel>Bus Types</FormLabel>
 							<FormControl>
-								<MultiSelector onValuesChange={field.onChange} values={field.value}>
-								{/* <MultiSelectorTrigger>
-        							<MultiSelectorInput placeholder="Select items" />
-      							</MultiSelectorTrigger> */}
-								<MultiSelectorContent>
-									<MultiSelectorList>
-										<MultiSelectorItem value={BusType.ElectricBus.toString()}>Electric Bus</MultiSelectorItem>
-										<MultiSelectorItem value={BusType.NewDennis.toString()}>New Dennis</MultiSelectorItem>
-										<MultiSelectorItem value={BusType.NewFlyer.toString()}>New Flyer</MultiSelectorItem>
-										<MultiSelectorItem value={BusType.OldDennis.toString()}>Old Dennis</MultiSelectorItem>
-										<MultiSelectorItem value={BusType.Xcelsior.toString()}>Xcelsior</MultiSelectorItem>
-									</MultiSelectorList>
-								</MultiSelectorContent>
-								</MultiSelector>
+								<MultipleSelector 
+									{...field} 
+									onChange={field.onChange} 
+									defaultOptions={OPTIONS} 
+									placeholder="Select Bus Types" />
 							</FormControl>
 							<FormMessage />
 						</FormItem>

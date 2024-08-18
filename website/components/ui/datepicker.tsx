@@ -14,13 +14,11 @@ import {
 } from "@/components/ui/popover"
 
 interface DatePickerProps {
-    setTodayAsDefault: boolean
+    date: Date | undefined,
+    onSelect: (date: Date | undefined) => void
 }
 
-export function DatePicker({setTodayAsDefault}: DatePickerProps) {
-	const defaultDate = setTodayAsDefault ? new Date() : undefined
-	const [date, setDate] = React.useState<Date | undefined>(defaultDate)
-
+export function DatePicker({date, onSelect}: DatePickerProps) {
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
@@ -39,7 +37,7 @@ export function DatePicker({setTodayAsDefault}: DatePickerProps) {
 				<Calendar
 					mode="single"
 					selected={date}
-					onSelect={setDate}
+					onSelect={onSelect}
 					initialFocus
 				/>
 			</PopoverContent>
