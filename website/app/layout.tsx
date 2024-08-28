@@ -5,7 +5,7 @@ import "../styles/globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Unitrans Management System",
+  title: "Unitrans Management Console",
   description: "Front end",
 };
 

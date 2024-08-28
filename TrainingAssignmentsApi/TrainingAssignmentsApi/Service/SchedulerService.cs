@@ -1,17 +1,26 @@
-using System;
+using TrainingAssignmentsApi.DataAccess;
 using TrainingAssignmentsApi.Model;
 
 namespace TrainingAssignmentsApi.Service;
 
 public class SchedulerService : ISchedulerService
 {
-    bool ISchedulerService.DeleteAssignments(DateOnly date)
+    private readonly IAssignmentsDataAccessService _assignmentsDataAccessService;
+    private readonly IPreferencesDataAccessService _preferencesDataAccessService;
+    public SchedulerService(IAssignmentsDataAccessService assignmentsDataAccessService, IPreferencesDataAccessService preferencesDataAccessService)
     {
-        throw new NotImplementedException();
+        _assignmentsDataAccessService = assignmentsDataAccessService;
+        _preferencesDataAccessService = preferencesDataAccessService;
     }
 
-    List<Assignment> ISchedulerService.GenerateAssignments(IList<TrainingRequest> requests, IDictionary<BusType, int> capacities)
+    void ISchedulerService.DeleteAssignments(DateOnly date)
     {
+        _assignmentsDataAccessService.DeleteAssignments(date);
+    }
+
+    List<Assignment> ISchedulerService.GenerateAssignments(DateOnly date, IDictionary<BusType, int> capacities)
+    {
+        var requests = _preferencesDataAccessService.GetRequests(date);
         var sortedTrainingSchedules = requests.OrderBy(x => x.StartTime);
 
         var generatedSchedules = new List<Assignment>();
@@ -27,10 +36,7 @@ public class SchedulerService : ISchedulerService
                     continue; 
                 }
 
-                if (!currentAssignmentsForBusType.TryPeek(out int busNumber, out DateTime earliestEndTime)) {
-                    // TODO: clean this up with exception
-                    continue; // Should never be possible, but can't hurt 
-                }
+                currentAssignmentsForBusType.TryPeek(out int busNumber, out DateTime earliestEndTime);
 
                 if (schedule.StartTime < earliestEndTime) {
                     // The earliest bus available is not available soon enough
@@ -41,7 +47,7 @@ public class SchedulerService : ISchedulerService
                 generatedSchedules.Add(new Assignment(schedule.Requestor, schedule.StartTime, schedule.EndTime, busNumber, busType));
 
                 // Update the queue to match the new endtime
-                sortedQueueOfAssignedSchedules[busType].DequeueEnqueue(busNumber, schedule.EndTime);
+                sortedQueueOfAssignedSchedules[busType].Enqueue(busNumber, schedule.EndTime);
             }
 
             // No existing bus matches our needs, let's make a new one
@@ -67,11 +73,12 @@ public class SchedulerService : ISchedulerService
             // Update the next bus number
             nextBusNumberByBusType[chosenBusType] = ++nextBusNumber;
         }
+        _assignmentsDataAccessService.SaveAssignments(generatedSchedules);
         return generatedSchedules;
     }
 
     List<Assignment> ISchedulerService.GetAssignments(DateOnly date)
     {
-        throw new NotImplementedException();
+        return _assignmentsDataAccessService.GetAssignments(date);
     }
 }

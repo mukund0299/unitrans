@@ -1,4 +1,5 @@
 using System;
+using TrainingAssignmentsApi.Contracts;
 using TrainingAssignmentsApi.Model;
 
 namespace TrainingAssignmentsApi.Mappers;

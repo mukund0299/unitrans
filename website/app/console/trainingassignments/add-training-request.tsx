@@ -3,15 +3,16 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { TrainingRequest } from "./training-requests-table";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { BusType } from "@/lib/apiclients/TrainingAssignmentsApi";
 import MultipleSelector, { Option } from "@/components/ui/multipleselector";
+import { formatDate, isAfter, parse } from "date-fns";
+import { BusType, postApiV1Preferences, TrainingRequest } from "@/lib/api/TrainingAssignmentsApi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const OPTIONS: Option[] = [
-	{ label: "Electic Bus", value: BusType.ElectricBus },
+	{ label: "Electric Bus", value: BusType.ElectricBus },
 	{ label: "New Dennis", value: BusType.NewDennis },
 	{ label: "Old Dennis", value: BusType.OldDennis },
 	{ label: "Xcelsior", value: BusType.Xcelsior },
@@ -31,30 +32,38 @@ const addRequestFormSchema = z.object({
 	busTypes: z.array(optionSchema).min(1)
 })
 
-interface AddTrainingRequestProps {
-	date: Date | undefined,
-	addTrainingRequest: (request: TrainingRequest) => void
+function createTime(time: string, date: Date): Date {
+	return parse(time, "k:m", date)
 }
 
-export default function AddTrainingRequest({date, addTrainingRequest}: AddTrainingRequestProps) {
+interface AddTrainingRequestProps {
+	date: Date,
+	closeDialogOnSubmit: () => void
+}
+
+export default function AddTrainingRequest({date, closeDialogOnSubmit}: AddTrainingRequestProps) {
 	const form = useForm<z.infer<typeof addRequestFormSchema>>({
 		resolver: zodResolver(addRequestFormSchema)
 	})
 
-	function onSubmit(values: z.infer<typeof addRequestFormSchema>) {
-		const startTime = new Date(date ??  new Date());
-		startTime.setHours(+values.startTime.split(":")[0], +values.startTime.split(":")[1])
+	const queryClient = useQueryClient()
+	const mutation = useMutation({
+		mutationFn: (trainingRequest: TrainingRequest) => {
+			return postApiV1Preferences(trainingRequest)
+		},
+		onSuccess: (response) => queryClient.setQueryData(["TrainingAssignmentsApi", "Preferences", formatDate(date, "yyyy-MM-dd")], response.data),
+		onSettled: closeDialogOnSubmit
+	})
 
-		const endTime = new Date(date ?? new Date());
-		endTime.setHours(+values.endTime.split(":")[0], +values.endTime.split(":")[1])
+	function onSubmit(values: z.infer<typeof addRequestFormSchema>) {
 		const trainingRequest: TrainingRequest = {
 			requestor: values.requestor,
-			startTime: startTime,
-			endTime: endTime,
+			startTime: createTime(values.startTime, date).toISOString(),
+			endTime: createTime(values.endTime, date).toISOString(),
 			busTypes: values.busTypes.map(x => x.value as BusType)
 		}
 		console.log(trainingRequest)
-		addTrainingRequest(trainingRequest)
+		mutation.mutate(trainingRequest)
 	}
 
 	return (
@@ -116,7 +125,7 @@ export default function AddTrainingRequest({date, addTrainingRequest}: AddTraini
 						</FormItem>
 					)}
 				/>
-				<Button type="submit">Submit</Button>
+				<Button type="submit">Add Request</Button>
 			</form>
 		</Form>
 	)

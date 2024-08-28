@@ -1,11 +1,8 @@
-using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
-using Serilog.Core;
 using TrainingAssignmentsApi.Mappers;
-using TrainingAssignmentsApi.Model;
+using TrainingAssignmentsApi.Contracts;
 using TrainingAssignmentsApi.Service;
 
 namespace TrainingAssignmentsApi.Controllers
@@ -23,21 +20,22 @@ namespace TrainingAssignmentsApi.Controllers
 
         [HttpPut]
         [Route("")]
-        public GenerateResponse Generate([FromBody] GenerateRequest request) {
-            var assignments = _schedulerService.GenerateAssignments(request.Requests, request.Capacities);
+        public GenerateResponse GenerateAssignments([FromBody, Required] GenerateRequest request) {
+            var assignments = _schedulerService.GenerateAssignments(DateOnly.Parse(request.Date), request.Capacities);
             return GenerateResponseMapper.ToGenerateResponse(assignments);
         }
 
         [HttpGet]
         [Route("")]
-        public GenerateResponse GetAssignments([FromQuery] DateOnly date) {
-            throw new NotImplementedException();
+        public GenerateResponse GetAssignments([FromQuery, Required, DataType(DataType.Date)] string date) {
+            var assignments = _schedulerService.GetAssignments(DateOnly.Parse(date));
+            return GenerateResponseMapper.ToGenerateResponse(assignments);
         }
 
         [HttpDelete]
         [Route("")]
-        public bool DeleteAssignments([FromQuery] DateOnly date) {
-            throw new NotImplementedException();
+        public void DeleteAssignments([FromQuery, Required, DataType(DataType.Date)] string date) {
+            _schedulerService.DeleteAssignments(DateOnly.Parse(date));
         }
     }
 }

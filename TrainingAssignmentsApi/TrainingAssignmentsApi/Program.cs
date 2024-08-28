@@ -5,12 +5,16 @@ using Serilog.Events;
 using Serilog.Filters;
 using Serilog.Formatting.Json;
 using Serilog.Sinks.SystemConsole.Themes;
+using TrainingAssignmentsApi.DataAccess;
+using TrainingAssignmentsApi.DataAccess.InMemory;
 using TrainingAssignmentsApi.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddSingleton<ISchedulerService, SchedulerService>();
+builder.Services.AddSingleton<IAssignmentsDataAccessService, InMemoryAssignmentsDataAccessService>();
+builder.Services.AddSingleton<IPreferencesDataAccessService, InMemoryPreferencesDataAccessService>();
 
 
 // API, Controllers
