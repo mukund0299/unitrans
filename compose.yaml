@@ -1,0 +1,10 @@
+services:
+  website:
+    build: ./website
+    ports:
+      - 3000:3000
+  
+  trainingassignmentsapi:
+    build: ./TrainingAssignmentsApi
+    ports:
+      - "5093:8080"

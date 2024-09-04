@@ -1,6 +1,10 @@
-import TrainingRequestsTable from "@/app/console/trainingassignments/training-requests-table";
 import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
+
+// Axios
+const instance = axios.create({
+	baseURL: "http://localhost:5093"
+})
 
 // Generic Types
 export interface TrainingRequest {
@@ -54,14 +58,14 @@ export const putApiV1Schedule = <TData = AxiosResponse<GenerateResponse>>(
 	generateRequest: GenerateRequest,
 	options?: AxiosRequestConfig,
 	): Promise<TData> => {
-		return axios.put(`/api/v1/Schedule`, generateRequest, options);
+		return instance.put(`/api/v1/Schedule`, generateRequest, options);
 	};
 
 export const getApiV1Schedule = <TData = AxiosResponse<GenerateResponse>>(
 	params: GetApiV1ScheduleParams,
 	options?: AxiosRequestConfig,
 	): Promise<TData> => {
-	return axios.get(`/api/v1/Schedule`, {
+	return instance.get(`/api/v1/Schedule`, {
 		...options,
 		params: { ...params, ...options?.params },
 	});
@@ -71,7 +75,7 @@ export const deleteApiV1Schedule = <TData = AxiosResponse<void>>(
 params: DeleteApiV1ScheduleParams,
 options?: AxiosRequestConfig,
 ): Promise<TData> => {
-	return axios.delete(`/api/v1/Schedule`, {
+	return instance.delete(`/api/v1/Schedule`, {
 		...options,
 		params: { ...params, ...options?.params },
 	});
@@ -86,14 +90,14 @@ export const putApiV1Preferences = <TData = AxiosResponse<void>>(
 	trainingRequest: TrainingRequest[],
 	options?: AxiosRequestConfig,
 	): Promise<TData> => {
-		return axios.put(`/api/v1/Preferences`, trainingRequest, options);
+		return instance.put(`/api/v1/Preferences`, trainingRequest, options);
 };
 
 export const getApiV1Preferences = <TData = AxiosResponse<TrainingRequest[]>>(
 	params: GetApiV1PreferencesParams,
 	options?: AxiosRequestConfig,
 	): Promise<TData> => {
-		return axios.get(`/api/v1/Preferences`, {
+		return instance.get(`/api/v1/Preferences`, {
 			...options,
 			params: { ...params, ...options?.params },
 		});
@@ -102,7 +106,7 @@ export const getApiV1Preferences = <TData = AxiosResponse<TrainingRequest[]>>(
 export const postApiV1Preferences = <TData = AxiosResponse<TrainingRequest[]>>(
 	request: TrainingRequest,
 	options?: AxiosRequestConfig): Promise<TData> => {
-		return axios.post(`/api/v1/Preferences`, request, options)
+		return instance.post(`/api/v1/Preferences`, request, options)
 }
 
 export type PutApiV1PreferencesResult = AxiosResponse<void>;

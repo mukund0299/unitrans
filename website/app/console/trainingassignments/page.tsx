@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { QueryClient, QueryClientProvider, useMutation, useQueryClient } from "@tanstack/react-query";
 import TrainingScheduleTable from "./training-schedule-table";
 import GenerateButton from "./generate-button";
+import { Separator } from "@/components/ui/separator";
 
 const queryClient = new QueryClient()
 
@@ -40,6 +41,7 @@ export default function Page() {
 					<GenerateButton date={date}></GenerateButton>
 				</div>
 			</div>
+			<Separator className="my-4"></Separator>
 			<div className="container"> 
 				<TrainingScheduleTable date={date} />
 			</div>

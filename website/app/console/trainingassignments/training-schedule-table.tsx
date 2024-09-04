@@ -1,6 +1,6 @@
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { DataTable } from "@/components/ui/data-table"
 import { getApiV1Schedule, GetApiV1ScheduleParams, TrainingAssignmentResponse } from "@/lib/api/TrainingAssignmentsApi"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@radix-ui/react-accordion"
 import { useQuery } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import { format, formatDate, parseISO } from "date-fns"
@@ -50,29 +50,30 @@ export default function TrainingScheduleTable({date}: TrainingScheduleTableProps
 	if (error) return 'An error has occurred: ' + error.message
 	return (
 		<>
-		<Accordion type="multiple">
-			{Object.entries(data.groupedAssignments).map(([bustype, groupedAssignments]) => {
-				return (
-					<AccordionItem value={bustype}>
-						<AccordionTrigger>{bustype}</AccordionTrigger>
-						<AccordionContent>
-							<Accordion type="multiple">
-								{Object.entries(groupedAssignments).map(([busNumber, assignments]) => {
-									return (
-										<AccordionItem value={busNumber}>
-											<AccordionTrigger>{busNumber}</AccordionTrigger>
-											<AccordionContent>
-												<DataTable columns={columns} data={assignments} />
-											</AccordionContent>
-										</AccordionItem>
-									)
-								})}
-							</Accordion>
-						</AccordionContent>
-					</AccordionItem>
-				)
-			})}
-		</Accordion>
+			<div className="text-xl pb-2">{`Currently Assigned Schedule`}</div>
+			<Accordion type="multiple">
+				{Object.entries(data.groupedAssignments).map(([bustype, groupedAssignments]) => {
+					return (
+						<AccordionItem value={bustype} key={bustype}>
+							<AccordionTrigger>{bustype}</AccordionTrigger>
+							<AccordionContent>
+								<Accordion type="multiple" className="px-3">
+									{Object.entries(groupedAssignments).map(([busNumber, assignments]) => {
+										return (
+											<AccordionItem value={busNumber} className="container" key={`${bustype}-${busNumber}`}>
+												<AccordionTrigger>{`Bus Number: ${busNumber}`}</AccordionTrigger>
+												<AccordionContent>
+													<DataTable columns={columns} data={assignments} />
+												</AccordionContent>
+											</AccordionItem>
+										)
+									})}
+								</Accordion>
+							</AccordionContent>
+						</AccordionItem>
+					)
+				})}
+			</Accordion>
 		</>
 	)
 }

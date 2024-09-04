@@ -47,7 +47,7 @@ public class SchedulerService : ISchedulerService
                 generatedSchedules.Add(new Assignment(schedule.Requestor, schedule.StartTime, schedule.EndTime, busNumber, busType));
 
                 // Update the queue to match the new endtime
-                sortedQueueOfAssignedSchedules[busType].Enqueue(busNumber, schedule.EndTime);
+                sortedQueueOfAssignedSchedules[busType].DequeueEnqueue(busNumber, schedule.EndTime);
             }
 
             // No existing bus matches our needs, let's make a new one

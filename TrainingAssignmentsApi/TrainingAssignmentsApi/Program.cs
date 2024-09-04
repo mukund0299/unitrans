@@ -59,6 +59,15 @@ Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().Enrich.FromLogContex
     .CreateLogger();
 builder.Services.AddSerilog();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "AllowAll",
+                      policy  =>
+                      {
+                          policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                      });
+});
+
 var app = builder.Build();
 app.UseSerilogRequestLogging();
 
@@ -70,9 +79,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("AllowAll");
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
