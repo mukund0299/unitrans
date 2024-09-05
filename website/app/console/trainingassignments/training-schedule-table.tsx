@@ -1,6 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { DataTable } from "@/components/ui/data-table"
-import { getApiV1Schedule, GetApiV1ScheduleParams, TrainingAssignmentResponse } from "@/lib/api/TrainingAssignmentsApi"
+import { TrainingAssignmentResponse, GetApiV1ScheduleParams, getApiV1Schedule, BusType } from "@/lib/api/training-assignments-api"
+import { busTypeDisplayName } from "@/lib/training-assignment-api-utils"
 import { useQuery } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import { format, formatDate, parseISO } from "date-fns"
@@ -55,7 +56,7 @@ export default function TrainingScheduleTable({date}: TrainingScheduleTableProps
 				{Object.entries(data.groupedAssignments).map(([bustype, groupedAssignments]) => {
 					return (
 						<AccordionItem value={bustype} key={bustype}>
-							<AccordionTrigger>{bustype}</AccordionTrigger>
+							<AccordionTrigger>{busTypeDisplayName(bustype as BusType)}</AccordionTrigger>
 							<AccordionContent>
 								<Accordion type="multiple" className="px-3">
 									{Object.entries(groupedAssignments).map(([busNumber, assignments]) => {

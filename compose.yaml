@@ -5,6 +5,18 @@ services:
       - 3000:3000
   
   trainingassignmentsapi:
+    depends_on:
+      - trainingassignmentsapi-db
     build: ./TrainingAssignmentsApi
     ports:
       - "5093:8080"
+
+  trainingassignmentsapi-db:
+   command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+   image: "amazon/dynamodb-local:latest"
+   container_name: trainingassignmentsapi-dynamodb-local
+   ports:
+     - "8000:8000"
+   volumes:
+     - "./docker/dynamodb/trainingassignmentsapi:/home/dynamodblocal/data"
+   working_dir: /home/dynamodblocal

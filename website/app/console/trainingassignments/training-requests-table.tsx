@@ -2,9 +2,13 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from "@/components/ui/data-table"
-import { useQueryClient, useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { format, formatDate, parseISO } from "date-fns"
-import { BusType, GetApiV1PreferencesParams, TrainingRequest, getApiV1Preferences } from "@/lib/api/TrainingAssignmentsApi"
+import { TrainingRequest, BusType, GetApiV1PreferencesParams, getApiV1Preferences } from "@/lib/api/training-assignments-api"
+import { busTypeDisplayName } from "@/lib/training-assignment-api-utils"
+import { TrashIcon } from "@heroicons/react/24/solid"
+import { Button } from "@/components/ui/button"
+import { Trash } from "lucide-react"
 
 const columns : ColumnDef<TrainingRequest>[] = [
 	{
@@ -33,9 +37,17 @@ const columns : ColumnDef<TrainingRequest>[] = [
 		header: "Bus Types",
 		cell: ({ row }) => {
 			const types = row.getValue("busTypes") as BusType[]
-			return <div>{types.join(", ")}</div>
+			return <div>{types.map(x => busTypeDisplayName(x)).join(", ")}</div>
 		  },
 	},
+	{
+		id: "delete",
+		cell: ({ row }) => {
+			return (
+				<Button onClick={() => console.log("Delete is not yet implemented")}><Trash></Trash></Button>
+			)
+		}
+	}
 ]
 
 interface TrainingRequestsTableProps {

@@ -13,6 +13,7 @@ export interface TrainingRequest {
 	requestor: string;
 	startTime: string;
 }
+
 export type BusType = (typeof BusType)[keyof typeof BusType];
 
 export const BusType = {

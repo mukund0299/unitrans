@@ -30,6 +30,7 @@ public class SchedulerService : ISchedulerService
         foreach (var schedule in sortedTrainingSchedules)
         {
             // Try to find an available bus from any of the requested bus types
+            var foundSuitableExistingBus = false;
             foreach (var busType in schedule.BusTypes) {
                 if (!sortedQueueOfAssignedSchedules.TryGetValue(busType, out var currentAssignmentsForBusType)) {
                     // No buses of this type have yet been assigned, maybe look for another
@@ -48,6 +49,11 @@ public class SchedulerService : ISchedulerService
 
                 // Update the queue to match the new endtime
                 sortedQueueOfAssignedSchedules[busType].DequeueEnqueue(busNumber, schedule.EndTime);
+                foundSuitableExistingBus = true;
+            }
+
+            if (foundSuitableExistingBus) {
+                continue; // we have already assigned this one from the existing buses
             }
 
             // No existing bus matches our needs, let's make a new one

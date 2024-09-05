@@ -7,16 +7,17 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import MultipleSelector, { Option } from "@/components/ui/multipleselector";
-import { formatDate, isAfter, parse } from "date-fns";
-import { BusType, postApiV1Preferences, TrainingRequest } from "@/lib/api/TrainingAssignmentsApi";
+import { formatDate, isBefore, parse } from "date-fns";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { BusType, TrainingRequest, postApiV1Preferences } from "@/lib/api/training-assignments-api";
+import { busTypeDisplayName } from "@/lib/training-assignment-api-utils";
 
 const OPTIONS: Option[] = [
-	{ label: "Electric Bus", value: BusType.ElectricBus },
-	{ label: "New Dennis", value: BusType.NewDennis },
-	{ label: "Old Dennis", value: BusType.OldDennis },
-	{ label: "Xcelsior", value: BusType.Xcelsior },
-	{ label: "NewFlyer", value: BusType.NewFlyer },
+	{ label: busTypeDisplayName(BusType.ElectricBus), value: BusType.ElectricBus },
+	{ label: busTypeDisplayName(BusType.NewDennis), value: BusType.NewDennis },
+	{ label: busTypeDisplayName(BusType.OldDennis), value: BusType.OldDennis },
+	{ label: busTypeDisplayName(BusType.Xcelsior), value: BusType.Xcelsior },
+	{ label: busTypeDisplayName(BusType.NewFlyer), value: BusType.NewFlyer },
 ];
 
 const optionSchema = z.object({
@@ -30,7 +31,10 @@ const addRequestFormSchema = z.object({
 	startTime: z.string(),
 	endTime: z.string(),
 	busTypes: z.array(optionSchema).min(1)
-})
+}).refine((obj) => {
+	const date = new Date();
+	return isBefore(createTime(obj.startTime, date), createTime(obj.endTime, date))
+}, {message: "Start time must be before end time", path: ["endTime"]})
 
 function createTime(time: string, date: Date): Date {
 	return parse(time, "k:m", date)
